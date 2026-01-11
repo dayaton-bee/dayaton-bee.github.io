@@ -267,7 +267,7 @@ export const Found: FunctionalComponent<FoundProps> = ({
           } cb-honey-dark-on-hover fls-1-1 pwa-4 ta-c bwb-1 ce-rev-honey`}
           onClick={handleHintsSelect}
         >
-          Hints
+          Hint
         </span>
       </div>
 
