@@ -27,7 +27,7 @@ export const getWordSort = (
     case "Found":
       return (ws) => [...ws];
     case "Length":
-      return (ws) => [...ws].sort((a, b) => a.length - b.length);
+      return (ws) => [...ws].sort((a, b) => a.length - b.length || a.localeCompare(b));
     case "Alphabetic":
       return (ws) => [...ws].sort((a, b) => a.localeCompare(b));
   }
