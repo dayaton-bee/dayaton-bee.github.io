@@ -1,6 +1,7 @@
 export const DetailOptions = {
   stats: "stats",
   words: "words",
+  hints: "hints"
 } as const;
 export type DetailOptions = typeof DetailOptions[keyof typeof DetailOptions];
 

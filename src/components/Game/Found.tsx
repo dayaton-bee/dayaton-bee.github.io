@@ -79,6 +79,26 @@ const getStats = (words: string[]) => {
   return stats;
 };
 
+const getHints = (words: string[]) => {
+  let hints: Record<string, number> = {};
+  words.forEach((word) => {
+
+    if (notNil(hints[word.substring(0, 3).toUpperCase()])) {
+      hints[word.substring(0, 3).toUpperCase()] = hints[word.substring(0, 3).toUpperCase()] + 1;
+    } else {
+      hints[word.substring(0, 3).toUpperCase()] = 1;
+    }
+  });
+  const hints_ordered = Object.keys(hints)
+  .sort() // Sort the keys alphabetically
+  .reduce((obj, key) => {
+    obj[key] = hints[key]; // Rebuild the object with sorted keys
+    return obj;
+  }, {});
+
+  return hints_ordered;
+};
+
 const getPangrams = (dictionary: string[], chars: string[], middle: string) => {
   const allchars = chars.concat(middle);
   return dictionary.filter((word) =>
@@ -109,6 +129,48 @@ const Stats: FunctionalComponent<StatsProps> = ({
       {dictStatsArray.map(({ key, value }) => (
         <li class="fld-row flg-3 jc-spb ce-rev-honey bwb-1">
           <span>{key} letter words</span>
+          <span>
+            <strong>{foundStats[key] || 0}</strong>
+            <span>/</span>
+            <strong>{value}</strong>
+          </span>
+        </li>
+      ))}
+      <li class="fld-row flg-3 jc-spb">
+        <span>Pangrams</span>
+        <span>
+          <strong>{foundPangrams.length}</strong>
+          <span>/</span>
+          <strong>{pangrams.length}</strong>
+        </span>
+      </li>
+    </ul>
+  );
+};
+
+const Hints: FunctionalComponent<StatsProps> = ({
+  found,
+  dictionary,
+  pangrams
+}) => {
+  const dictStatsArray = useMemo(() => {
+    const hints = getHints(dictionary);
+    return Object.keys(hints).map((key) => ({
+      key,
+      value: hints[key],
+    }));
+  }, [dictionary]);
+  const foundStats = useMemo(() => getHints(found), [found]);
+  const foundPangrams = useMemo(() => found.filter(isIn(pangrams)), [
+    found,
+    pangrams,
+  ]);
+
+  return (
+    <ul class="fs-d1 fld-col flg-2">
+      {dictStatsArray.map(({ key, value }) => (
+        <li class="fld-row flg-3 jc-spb ce-rev-honey bwb-1">
+          <span>starts with <b>{key}</b></span>
           <span>
             <strong>{foundStats[key] || 0}</strong>
             <span>/</span>
@@ -159,6 +221,10 @@ export const Found: FunctionalComponent<FoundProps> = ({
     () => onDetailsChange(DetailOptions.stats),
     [onDetailsChange]
   );
+  const handleHintsSelect = useCallback(
+    () => onDetailsChange(DetailOptions.hints),
+    [onDetailsChange]
+  );
 
   const [showAll, setShowAll] = useState(false);
   const handleShowAll = useCallback(() => setShowAll((s) => !s), [setShowAll]);
@@ -194,6 +260,14 @@ export const Found: FunctionalComponent<FoundProps> = ({
           onClick={handleStatsSelect}
         >
           Stats
+        </span>
+        <span
+          class={`${
+            details === "hints" ? "cb-honey" : "cb-rev-honey-dark"
+          } cb-honey-dark-on-hover fls-1-1 pwa-4 ta-c bwb-1 ce-rev-honey`}
+          onClick={handleHintsSelect}
+        >
+          Hints
         </span>
       </div>
 
@@ -231,7 +305,17 @@ export const Found: FunctionalComponent<FoundProps> = ({
           )}
         </If>
 
-        <If predicate={isBefore(parseISO(game.date), startOfToday())}>
+        <If predicate={details === "hints"}>
+          {() => (
+            <Hints
+              found={found}
+              dictionary={game.dictionary}
+              pangrams={pangrams}
+            />
+          )}
+        </If>
+        
+          <If predicate={isBefore(parseISO(game.date), startOfToday())}>
           {() => (
             <Button
               theme="ct-honey ct-disabled-on-disabled"
