@@ -15,8 +15,8 @@ export function App() {
       <Notification />
 
       <Router>
-        <GameListPage path="https://dayaton-bee.github.io/" />
-        <GamePage path="https://dayaton-bee.github.io/games/:id" />
+        <GameListPage path="/" />
+        <GamePage path="/games/:id" />
         <SettingsPage path="/settings" />
         <HelpPage path="/help" />
         <NotFoundPage default />
